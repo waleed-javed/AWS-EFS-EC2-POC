@@ -1,0 +1,32 @@
+{
+  "name": "edward_poc",
+  "version": "1.0.0",
+  "description": "POC EFS EC2",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/waleed-javed/AWS-EFS-EC2-POC.git"
+  },
+  "keywords": [
+    "POC",
+    "EFS",
+    "EC2"
+  ],
+  "author": "Waleed JAved",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/waleed-javed/AWS-EFS-EC2-POC/issues"
+  },
+  "homepage": "https://github.com/waleed-javed/AWS-EFS-EC2-POC#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "formidable": "^2.0.1",
+    "fs": "^0.0.1-security",
+    "gitignore": "^0.7.0",
+    "http": "^0.0.1-security"
+  }
+}
