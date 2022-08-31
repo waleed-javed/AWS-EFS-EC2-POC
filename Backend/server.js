@@ -5,15 +5,19 @@ var fs = require('fs');
 http.createServer(function (req, res) {
   if (req.url == '/fileupload') {
     var form = new formidable.IncomingForm();
+    
     form.parse(req, function (err, fields, files) {
       var oldpath = files.filetoupload.filepath;
       var newpath = 'home/ec2-user/efs-mount-point/' + files.filetoupload.originalFilename;
-      fs.rename(oldpath, newpath, function (err) {
-        if (err) throw err;
-        res.write('File uploaded and moved!');
-        res.end();
-      });
- });
+      var rawData =  fs.readFileSync(oldpath); //read data from old file
+    
+      fs.writeFile(newpath,rawData, function (err) {
+          if (err) {console.log(err)};
+          res.write('File uploaded and moved!').end();});
+    //remove file to clean the tmp storage  
+      fs.rm(oldpath); 
+    
+    });
   } else {
     res.writeHead(200, {'Content-Type': 'text/html'});
     res.write('<form action="fileupload" method="post" enctype="multipart/form-data">');
