@@ -1,31 +1,39 @@
-var http = require('http');
-var formidable = require('formidable');
-var fs = require('fs');
+var express = require('express');
+var multer  = require('multer');
+var fs  = require('fs');
 
-http.createServer(function (req, res) {
-  if (req.url == '/fileupload') {
-    var form = new formidable.IncomingForm();
-    
-    form.parse(req, function (err, fields, files) {
-      var oldpath = files.filetoupload.filepath;
-      var newpath = 'home/ec2-user/efs-mount-point/' + files.filetoupload.originalFilename;
-      var rawData =  fs.readFileSync(oldpath); //read data from old file
-    
-      fs.writeFile(newpath,rawData, function (err) {
-          if (err) {console.log(err)};
-          res.write('File uploaded and moved!').end();});
-    //remove file to clean the tmp storage  
-      fs.rm(oldpath); 
-    
+var app = express();
+app.set('view engine', 'ejs');
+
+app.get('/', (req, res) => {
+  res.writeHead(200, {'Content-Type': 'text/html'});
+  res.write('<form action="fileupload" method="post" enctype="multipart/form-data">');
+  res.write('<h1>Select File To Upload:</h1><br><input type="file" name="filetoupload"><br>');
+  res.write('<input type="submit">');
+  res.write('</form>');
+});
+
+var storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+        var dir = 'home/ubuntu/mnt/efs/fs1'; //check if this one exits
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+        }
+        callback(null, dir);
+    },
+    filename: function (req, file, callback) {
+        callback(null, file.originalname);
+    }
+});
+
+var upload = multer({storage: storage}).array('files', 12);
+app.post('/upload', function (req, res, next) {
+    upload(req, res, function (err) {
+        if (err) {
+            return res.end("Something went wrong:(");
+        }
+        res.end("Upload completed.");
     });
-  } else {
-    res.writeHead(200, {'Content-Type': 'text/html'});
-    res.write('<form action="fileupload" method="post" enctype="multipart/form-data">');
-    res.write('<h1>Select File To Upload:</h1><br><input type="file" name="filetoupload"><br>');
-    res.write('<input type="submit">');
-    res.write('</form>');
-    return res.end();
-  }
-}).listen(8000,()=>{
-  console.log('Server Running on Port: 8000');
-}); 
+})
+
+app.listen(8000);
